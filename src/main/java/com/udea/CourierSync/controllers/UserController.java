@@ -46,6 +46,10 @@ public class UserController {
 
   @PutMapping("/{id}")
   public ResponseEntity<UserDTO> update(@PathVariable Long id, @RequestBody UserDTO dto) {
+    // Si viene una contraseña nueva, codificarla antes de actualizar
+    if (dto.getPassword() != null && !dto.getPassword().trim().isEmpty()) {
+      dto.setPassword(passwordEncoder.encode(dto.getPassword()));
+    }
     UserDTO updated = userService.update(id, dto);
     return ResponseEntity.ok(updated);
   }

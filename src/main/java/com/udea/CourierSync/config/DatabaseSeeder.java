@@ -43,9 +43,12 @@ public class DatabaseSeeder {
 
   private void seedUsers() {
     String adminEmail = "admin@couriersync.com";
-    long adminCount = userRepository.count();
-
-    if (adminCount == 0) {
+    
+    // Buscar el usuario existente
+    var existingUserOpt = userRepository.findByEmail(adminEmail);
+    
+    if (existingUserOpt.isEmpty()) {
+      // Crear nuevo usuario si no existe
       try {
         logger.info("Creating admin user...");
         User adminUser = new User();
@@ -62,7 +65,21 @@ public class DatabaseSeeder {
         logger.error("Stack trace: ", e);
       }
     } else {
-      logger.info("Admin user already exists, skipping seeding");
+      // Verificar y actualizar el rol si es necesario
+      User existingUser = existingUserOpt.get();
+      if (existingUser.getRole() == null) {
+        logger.warn("Admin user exists but has no role. Updating role to ADMIN...");
+        try {
+          existingUser.setRole(UserRole.ADMIN);
+          userRepository.save(existingUser);
+          logger.info("Admin user role updated successfully to ADMIN");
+        } catch (Exception e) {
+          logger.error("Error updating admin user role: {}", e.getMessage());
+          logger.error("Stack trace: ", e);
+        }
+      } else {
+        logger.info("Admin user already exists with role: {}", existingUser.getRole());
+      }
     }
   }
 }

@@ -45,10 +45,20 @@ public class UserService {
   public UserDTO update(Long id, UserDTO dto) {
     if (dto == null)
       throw new BadRequestException("UserDTO must not be null");
-    userRepository.findById(id)
+    
+    // Cargar el usuario existente
+    User existingUser = userRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+    
+    // Mapear el DTO a Entity
     User toSave = userMapper.toEntity(dto);
     toSave.setId(id);
+    
+    // Si el password viene null o vacío, mantener el password actual
+    if (dto.getPassword() == null || dto.getPassword().trim().isEmpty()) {
+      toSave.setPassword(existingUser.getPassword());
+    }
+    
     User saved = userRepository.save(toSave);
     return userMapper.toDTO(saved);
   }

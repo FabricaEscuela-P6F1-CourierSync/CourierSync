@@ -24,6 +24,10 @@ public class UserPrincipal implements UserDetails {
   }
 
   public static UserPrincipal create(User user) {
+    // Validar que el usuario tenga un rol asignado
+    if (user.getRole() == null) {
+      throw new IllegalStateException("User must have a role assigned. User email: " + user.getEmail());
+    }
     return new UserPrincipal(
         user.getId(),
         user.getName(),
