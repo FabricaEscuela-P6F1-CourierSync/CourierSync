@@ -19,7 +19,6 @@ import com.udea.CourierSync.security.JwtTokenProvider;
 import com.udea.CourierSync.security.UserPrincipal;
 
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -48,13 +47,13 @@ public class AuthController {
       SecurityContextHolder.getContext().setAuthentication(authentication);
 
       String jwt = tokenProvider.generateToken(authentication);
-      
+
       // Obtener información del usuario autenticado
       UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-      
+
       // Debug: Verificar authorities
       System.out.println("🔍 AuthController - Authorities: " + userPrincipal.getAuthorities());
-      
+
       String role = userPrincipal.getAuthorities().stream()
           .findFirst()
           .map(authority -> {
@@ -66,26 +65,25 @@ public class AuthController {
             System.err.println("❌ AuthController - Usuario sin rol asignado. Email: " + userPrincipal.getUsername());
             return new RuntimeException("Usuario sin rol asignado");
           });
-      
+
       // Validar que el rol sea válido
       if (!role.matches("ADMIN|OPERATOR|DRIVER")) {
-          System.err.println("❌ AuthController - Rol inválido: " + role);
-          throw new RuntimeException("Rol de usuario inválido: " + role);
+        System.err.println("❌ AuthController - Rol inválido: " + role);
+        throw new RuntimeException("Rol de usuario inválido: " + role);
       }
-      
+
       // Debug: Log para verificar qué se está devolviendo
       System.out.println("🔍 AuthController - Login exitoso:");
       System.out.println("  - Email: " + userPrincipal.getUsername());
       System.out.println("  - Nombre: " + userPrincipal.getName());
       System.out.println("  - Rol: " + role);
-      
+
       Map<String, Object> response = Map.of(
           "accessToken", jwt,
           "role", role,
           "name", userPrincipal.getName() != null ? userPrincipal.getName() : "",
-          "email", userPrincipal.getUsername()
-      );
-      
+          "email", userPrincipal.getUsername());
+
       return ResponseEntity.ok(response);
     } catch (Exception e) {
       System.err.println("❌ AuthController - Error en login:");
@@ -94,8 +92,7 @@ public class AuthController {
       e.printStackTrace();
       return ResponseEntity.status(401).body(Map.of(
           "error", "Error de autenticación",
-          "message", e.getMessage() != null ? e.getMessage() : "Error desconocido"
-      ));
+          "message", e.getMessage() != null ? e.getMessage() : "Error desconocido"));
     }
   }
 }
