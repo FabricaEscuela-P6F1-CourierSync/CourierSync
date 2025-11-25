@@ -121,6 +121,6 @@ public class ShipmentService {
       history.setNewStatus(status);
     }
 
-    return ShipmentMapper.INSTANCE.toDTO(shipmentRepository.save(shipment));
+    return shipmentMapper.toDTO(shipmentRepository.save(shipment));
   }
 }
