@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: courier-sync-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: courier-sync
+  template:
+    metadata:
+      labels:
+        app: courier-sync
+    spec:
+      containers:
+        - name: courier-sync-container
+          image: courier-sync-image:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
