@@ -3,9 +3,11 @@ FROM maven:3.9-eclipse-temurin-17 AS build
 
 WORKDIR /app
 
-# Cache dependencies
 COPY pom.xml .
+
+RUN echo "Building dependencies..."
 RUN mvn -q -e -DskipTests dependency:go-offline
+RUN echo "Dependencies built!"
 
 # Build
 COPY src ./src
@@ -23,5 +25,3 @@ EXPOSE 8080
 
 # Allow overriding Spring config via envs (e.g., SPRING_DATASOURCE_URL)
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
-
-
